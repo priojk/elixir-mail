@@ -111,6 +111,15 @@ defmodule Mail.Parsers.RFC2822 do
       ) do
     erl_from_timestamp("#{date} #{month} #{year} #{hour}:#{minute}:#{second} (#{timezone})")
   end
+  
+  # additional fix for obsolete, non-three-letter-timezones
+  def erl_from_timestamp(
+        <<date::binary-size(2), " ", month::binary-size(3), " ", year::binary-size(4), " ",
+          hour::binary-size(2), ":", minute::binary-size(2), ":", second::binary-size(2), " ",
+         _rest::binary>>
+      ) do
+    erl_from_timestamp("#{date} #{month} #{year} #{hour}:#{minute}:#{second} (+00:00)")
+  end
 
   # Fixes invalid value: Tue Aug 8 12:05:31 CAT 2017
   def erl_from_timestamp(
